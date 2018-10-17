@@ -16,12 +16,11 @@ NASM         = nasm
 
 CC_DBG_FLAGS = -ggdb
 CC_FLAGS     = -lasound 
-NASM_FLAGS   = -Dsndfile=$(MUSIC_FILE) -felf64
+NASM_FLAGS   = -dsndfile=$(MUSIC_FILE) -felf64
 
 OUTPUT       = build/jeopardy
 
 all: $(OUTPUT)
-	echo Not yet implemented
 
 re: fclean all
 	

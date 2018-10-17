@@ -54,5 +54,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+# Build dir
+build/
+
 # For copyright reasons, jeopardy.wav cannot be shipped in the repo.
 jeopardy.wav

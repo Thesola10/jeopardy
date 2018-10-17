@@ -9,7 +9,7 @@ global music_end
 global music_len
 
 music_start:
-    incbin sndfile
+    incbin "jeopardy.wav"
 music_end:
 
 music_len:   equ   music_end-music_start

@@ -9,6 +9,7 @@
 int main(int argc, char *argv[])
 {
     int pcm;
+    int tmp;
     int seconds = music_start->data_len / music_start->byte_rate;
     
     snd_pcm_t *pcm_handle;
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     char *buf;
     int buf_size;
     int loops;
+    
     
     if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, 
                             SND_PCM_STREAM_PLAYBACK, 0) < 0) 
@@ -41,7 +43,7 @@ int main(int argc, char *argv[])
     {
         printf("ERROR: Could not set channels: %s", snd_strerror(pcm));
     } else if (pcm = snd_pcm_hw_params_set_rate_near(pcm_handle, params, 
-                            music_start->sample_rate) < 0)
+                            music_start->sample_rate, 0) < 0)
     {
         printf("ERROR: Could not set sample rate: %s", snd_strerror(pcm));
     }
@@ -52,16 +54,27 @@ int main(int argc, char *argv[])
         
     snd_pcm_hw_params_get_period_size(params, &frames, 0);
     
-    buff_size = frames * music_start->num_channels * 2;
-    buff = (char *) malloc(buff_size);
+    buf_size = frames * music_start->num_channels * 2;
+    buf = &music_start->bytes;
+    
+    snd_pcm_hw_params_get_period_time(params, &tmp, NULL);
     
     for (loops = (seconds * 1000000) / tmp; loops > 0; loops--)
     {
-        if (snd_pcm_writei(pcm_handle, buff, frames) == -EPIPE)
+        pcm = snd_pcm_writei(pcm_handle, buf, frames); 
+        if (pcm == -EPIPE)
         {
-            
+            snd_pcm_prepare(pcm_handle);
+        } else if (pcm < 0)
+        {
+            printf("ERROR: Can't write to device: %s", snd_strerror(pcm));
         }
+        
+        buf += buf_size;
     }
+    
+    snd_pcm_drain(pcm_handle);
+    snd_pcm_close(pcm_handle);
     
     return (0);
 }
