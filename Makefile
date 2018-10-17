@@ -7,7 +7,7 @@ SOURCE_DIR   = src
 SOURCE       = $(wildcard $(SOURCE_DIR)/*.c)
 SOURCE_ASM   = $(wildcard $(SOURCE_DIR)/*.asm)
 
-OBJ_ASM      = $(patsubst %.asm,%.o,$(SOURCE_ASM))
+OBJ_ASM      = $(patsubst $(SOURCE_DIR)/%.asm,$(BUILD_DIR)/%.o,$(SOURCE_ASM))
 
 MUSIC_FILE   = jeopardy.wav
 
@@ -33,7 +33,7 @@ $(OUTPUT_INT): $(SOURCE) $(OBJ_ASM)
 $(OUTPUT): $(SOURCE) $(OBJ_ASM) 
 	$(CC) $(CC_FLAGS) $(SOURCE) $(OBJ_ASM) -o $@
 	
-%.o: %.asm 
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)%.asm 
 	$(NASM) $(NASM_FLAGS) $< -o $@
 
 clean: 
