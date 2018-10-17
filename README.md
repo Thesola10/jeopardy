@@ -24,7 +24,10 @@ bash: Write the following in `~/.bashrc`
 
 zsh: Write the following in `~/.zshrc`
 
-        precmd_functions+=("/path/to/jeopardy")
+        function run_jeopardy() {
+            /path/to/jeopardy
+        }
+        precmd_functions+=(run_jeopardy)
         
 fish: Write the following in `~/.config/fish/config.fish`
 
