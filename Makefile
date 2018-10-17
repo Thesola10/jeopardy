@@ -14,7 +14,6 @@ MUSIC_FILE   = jeopardy.wav
 CC           = gcc
 NASM         = nasm
 
-CC_DBG_FLAGS = -ggdb
 CC_FLAGS     = -lasound 
 NASM_FLAGS   = -dsndfile=$(MUSIC_FILE) -felf64
 
