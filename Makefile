@@ -15,7 +15,7 @@ CC           = gcc
 NASM         = nasm
 
 CC_FLAGS     = -lasound 
-NASM_FLAGS   = -dsndfile=$(MUSIC_FILE) -felf64
+NASM_FLAGS   = -dsndfile=\"$(MUSIC_FILE)\" -felf64
 
 OUTPUT_INT   = build/jeopardy-intlock
 OUTPUT       = build/jeopardy
