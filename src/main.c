@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
     snd_pcm_hw_params_get_period_time(params, &tmp, NULL);
     
     countl = (seconds * 1000000) / tmp;
+        
+#ifdef SIGINT_LOCK
+    signal(SIGINT, loop_reset);
+#endif
     
     for (loops = 0; loops < countl; loops++)
     {
@@ -73,10 +77,6 @@ int main(int argc, char *argv[])
         
         buf += buf_size;
     }
-    
-#ifdef SIGINT_LOCK
-    signal(SIGINT, loop_reset);
-#endif
     
     snd_pcm_drain(pcm_handle);
     snd_pcm_close(pcm_handle);
