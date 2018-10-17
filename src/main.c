@@ -13,8 +13,6 @@ char *buf;
 #ifdef SIGINT_LOCK
 void loop_reset()
 {
-    loops = 0;
-    buf = music_start.bytes;
     signal(SIGINT, loop_reset);
 }
 #endif
