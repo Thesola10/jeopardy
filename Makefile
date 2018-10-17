@@ -23,9 +23,12 @@ OUTPUT       = build/jeopardy
 all: $(OUTPUT)
 
 re: fclean all
+
+intlock: $(SOURCE) $(OBJ_ASM)
+	$(CC) $(CC_FLAGS) -DSIGINT_LOCK $(SOURCE) $(OBJ_ASM) -o $@
 	
 $(OUTPUT): $(SOURCE) $(OBJ_ASM) 
-	$(CC) $(CC_FLAGS) $(SOURCE) $(OBJ_ASM) -o $(OUTPUT)
+	$(CC) $(CC_FLAGS) $(SOURCE) $(OBJ_ASM) -o $@
 	
 %.o: %.asm 
 	$(NASM) $(NASM_FLAGS) $< -o $@

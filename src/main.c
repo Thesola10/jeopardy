@@ -76,6 +76,10 @@ int main(int argc, char *argv[])
         buf += buf_size;
     }
     
+#ifdef SIGINT_LOCK
+    //TODO: set the ^C trap
+#endif
+    
     snd_pcm_drain(pcm_handle);
     snd_pcm_close(pcm_handle);
     
