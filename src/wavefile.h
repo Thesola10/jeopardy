@@ -34,7 +34,7 @@ typedef struct {
     uint8_t bytes[];        // Actual data
 } wav_file_t;
 
-extern wav_file_t *music_start;
+extern wav_file_t music_start;
 extern void *music_end;
 extern int music_len;
 
