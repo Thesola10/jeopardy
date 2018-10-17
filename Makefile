@@ -33,7 +33,7 @@ $(OUTPUT_INT): $(SOURCE) $(OBJ_ASM)
 $(OUTPUT): $(SOURCE) $(OBJ_ASM) 
 	$(CC) $(CC_FLAGS) $(SOURCE) $(OBJ_ASM) -o $@
 	
-$(BUILD_DIR)/%.o: $(SOURCE_DIR)%.asm 
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.asm 
 	$(NASM) $(NASM_FLAGS) $< -o $@
 
 clean: 
