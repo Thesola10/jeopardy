@@ -4,20 +4,32 @@
  * You REALLY don't wanna deal with this program. Just don't.
  */
  
+#include <signal.h>
 #include "wavefile.h"
+
+int loops;
+char *buf;
+
+#ifdef SIGINT_LOCK
+void loop_reset()
+{
+    loops = 0;
+    buf = music_start.bytes;
+    signal(SIGINT, loop_reset);
+}
+#endif
 
 int main(int argc, char *argv[])
 {
     int pcm;
     int tmp;
-    int seconds = music_start.data_len / music_start.byte_rate;
+    int countl;
+    int seconds = music_start.wav_size / music_start.byte_rate;
     
     snd_pcm_t *pcm_handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
-    char *buf;
     int buf_size;
-    int loops;
     
     
     if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, 
@@ -30,26 +42,10 @@ int main(int argc, char *argv[])
     snd_pcm_hw_params_alloca(&params);
     snd_pcm_hw_params_any(pcm_handle, params);
     
-    if ((pcm = snd_pcm_hw_params_set_access(pcm_handle, params,
-                            SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
-    {
-        printf("ERROR: Could not set playback mode: %s", snd_strerror(pcm));
-    }
-    if ((pcm = snd_pcm_hw_params_set_format(pcm_handle, params,
-                            SND_PCM_FORMAT_S16_LE)) < 0)
-    {
-        printf("ERROR: Could not set playback format: %s", snd_strerror(pcm));
-    } 
-    if ((pcm = snd_pcm_hw_params_set_channels(pcm_handle, params, 
-                            music_start.num_channels)) < 0)
-    {
-        printf("ERROR: Could not set channels: %s", snd_strerror(pcm));
-    } 
-    if ((pcm = snd_pcm_hw_params_set_rate_near(pcm_handle, params, 
-                            &music_start.sample_rate, 0)) < 0)
-    {
-        printf("ERROR: Could not set sample rate: %s", snd_strerror(pcm));
-    }
+    snd_pcm_hw_params_set_access(pcm_handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+    snd_pcm_hw_params_set_format(pcm_handle, params, SND_PCM_FORMAT_S16_LE);
+    snd_pcm_hw_params_set_channels(pcm_handle, params, music_start.num_channels);
+    snd_pcm_hw_params_set_rate_near(pcm_handle, params, &music_start.sample_rate, 0);
     
     // set params
     if ((pcm = snd_pcm_hw_params(pcm_handle, params)) < 0)
@@ -62,7 +58,9 @@ int main(int argc, char *argv[])
     
     snd_pcm_hw_params_get_period_time(params, &tmp, NULL);
     
-    for (loops = (seconds * 1000000) / tmp; loops; loops--)
+    countl = (seconds * 1000000) / tmp;
+    
+    for (loops = 0; loops < countl; loops++)
     {
         pcm = snd_pcm_writei(pcm_handle, buf, frames); 
         if (pcm == -EPIPE)
@@ -77,7 +75,7 @@ int main(int argc, char *argv[])
     }
     
 #ifdef SIGINT_LOCK
-    //TODO: set the ^C trap
+    signal(SIGINT, loop_reset);
 #endif
     
     snd_pcm_drain(pcm_handle);

@@ -18,13 +18,16 @@ CC_DBG_FLAGS = -ggdb
 CC_FLAGS     = -lasound 
 NASM_FLAGS   = -dsndfile=$(MUSIC_FILE) -felf64
 
+OUTPUT_INT   = build/jeopardy-intlock
 OUTPUT       = build/jeopardy
 
 all: $(OUTPUT)
 
 re: fclean all
 
-intlock: $(SOURCE) $(OBJ_ASM)
+intlock: $(OUTPUT_INT)
+
+$(OUTPUT_INT): $(SOURCE) $(OBJ_ASM)
 	$(CC) $(CC_FLAGS) -DSIGINT_LOCK $(SOURCE) $(OBJ_ASM) -o $@
 	
 $(OUTPUT): $(SOURCE) $(OBJ_ASM) 
@@ -37,6 +40,6 @@ clean:
 	rm -f $(BUILD_DIR)/*.o
 	
 fclean: clean
-	rm -f $(OUTPUT) 
+	rm -f $(OUTPUT) $(INTLOCK)
 	
-.PHONY: all re clean fclean
+.PHONY: all re intlock clean fclean
