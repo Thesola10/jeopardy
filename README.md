@@ -4,7 +4,7 @@
 
 ## Build
 
-For copyright reasons, the `jeopardy.wav` file is **not included**. To build, download the Jeopardy music (or whichever you want), convert it to 44kHz PCM wave, and place it at the root of this repo as `jeopardy.wav`.
+For copyright reasons, the `jeopardy.wav` file is **not included**. To build, download the Jeopardy music (or whichever you want), convert it to standard PCM wave, and place it at the root of this repo as `jeopardy.wav`.
 
 Afterwards, (this part is not yet implemented, bear with me)
 
