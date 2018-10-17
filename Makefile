@@ -10,16 +10,12 @@ SOURCE_ASM   = $(wildcard $(SOURCE_DIR)/*.asm)
 OBJ_ASM      = $(patsubst %.asm,%.o,$(SOURCE_ASM))
 
 MUSIC_FILE   = jeopardy.wav
-MUSIC_RATE   = 44100
-MUSIC_CHAN   = 2
-MUSIC_LEN    = 32
 
 CC           = gcc
 NASM         = nasm
 
 CC_DBG_FLAGS = -ggdb
 CC_FLAGS     = -lasound 
-CC_FLAGS    += -DRATE=$(MUSIC_RATE) -DNCH=$(MUSIC_CHAN) -DLEN=$(MUSIC_LEN)
 NASM_FLAGS   = -Dsndfile=$(MUSIC_FILE) -felf64
 
 OUTPUT       = build/jeopardy
