@@ -11,18 +11,17 @@ int count = 10;
 void loop_reset()
 {
     printf("%d Ctrl-C's left...", count);
-    if (count)
-        signal(SIGINT, loop_reset);
-    else
+    count--;
+    if (!count)
         exit(0);
 }
 
 int main(int argc, char *argv[])
 {
     // Start blocking SIGINT (^C)
-    signal(SIGINT, loop_reset);
     printf("Started capturing Ctrl-C.");
+    signal(SIGINT, loop_reset);
     while (count)
-        ;
+        sleep(2);
     return (0);
 }

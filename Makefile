@@ -18,7 +18,7 @@ MUSIC_FILE   = jeopardy.wav
 CC           = gcc
 NASM         = nasm
 
-CC_FLAGS     = -lasound 
+CC_FLAGS     = -lasound -lpthread -ggdb
 NASM_FLAGS   = -dsndfile=\"$(MUSIC_FILE)\" -felf64
 
 OUTPUT       = build/jeopardy

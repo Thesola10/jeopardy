@@ -3,14 +3,44 @@
  * License: GNU GPL 3.0
  * You REALLY don't wanna deal with this program. Just don't.
  */
- 
-#include <signal.h>
+
 #include "wavefile.h"
 
 int loops;
 char *buf;
 
+// Allocate ALSA parameter pointers
+snd_pcm_t *pcm_handle;
+snd_pcm_hw_params_t *params;
+snd_pcm_uframes_t frames;
+
+#ifdef VOLUME_LOCK
+#include <pthread.h>
+// Allocate ALSA mixer pointers
+long int volmin, volmax;
+
+snd_mixer_t *mixer_handle;
+snd_mixer_selem_id_t *sid;
+snd_mixer_elem_t *element;
+
+pthread_t thread_id;
+
+int drained = 0;
+
+void *volume_keep(void *vargp)
+{
+    while (!drained)
+    {
+        snd_mixer_selem_set_playback_volume_all(element, volmax);
+        snd_mixer_selem_set_playback_switch_all(element, 1);
+        sleep(1);
+    }
+    return 0;
+}
+#endif
+
 #ifdef SIGINT_LOCK
+#include <signal.h>
 void loop_reset()
 {
     signal(SIGINT, loop_reset);
@@ -20,26 +50,12 @@ void loop_reset()
 int main(int argc, char *argv[])
 {
     int pcm;      // Exit code for ALSA snd_pcm functions
-    int tmp;      // Temporary variable (See line 64)
+    int tmp;      // Temporary variable (See line 88)
     int buf_size; // The increment to use for buffer feed loops.
     int countl;   // Count Loops, how many buffer feed loops we need to reach EOF
     int seconds = music_start.wav_size / music_start.byte_rate;
                   // Number of seconds the wave file will last. Important for 
                   // loop number calculation
-    
-    // Allocate ALSA parameter pointers
-    snd_pcm_t *pcm_handle;
-    snd_pcm_hw_params_t *params;
-    snd_pcm_uframes_t frames;
-
-#ifdef VOLUME_LOCK
-    // Allocate ALSA mixer pointers
-    int volmin, volmax;
-    
-    snd_mixer_t *mixer_handle;
-    snd_mixer_selem_id_t *sid;
-    snd_mixer_elem_t *element;
-#endif
     
     // Try and open the default ALSA device
     if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, SND_PCM_STREAM_PLAYBACK, 0) < 0) 
@@ -94,6 +110,10 @@ int main(int argc, char *argv[])
     signal(SIGINT, loop_reset);
 #endif
     
+#ifdef VOLUME_LOCK
+    pthread_create(&thread_id, NULL, volume_keep, NULL);
+#endif
+    
     // Feed our wav file to ALSA
     for (loops = 0; loops < countl; loops++)
     {
@@ -107,16 +127,14 @@ int main(int argc, char *argv[])
         }
         
         buf += buf_size;
-#ifdef VOLUME_LOCK
-        snd_mixer_selem_set_playback_volume_all(element, volmax);
-        snd_mixer_selem_set_playback_switch_all(element, 1);
-#endif
     }
     
     // Clean up
     snd_pcm_drain(pcm_handle);
     snd_pcm_close(pcm_handle);
 #ifdef VOLUME_LOCK
+    drained = 1;
+    pthread_join(thread_id, NULL);
     snd_mixer_close(mixer_handle);
 #endif
     
