@@ -12,7 +12,7 @@ Prerequisites: `libasound` (ALSA), `cc`, `nasm`.
 2) Make the `build` directory at the root of this repo.
 3) Run `make` to build the program.
 4) You will find the product in `build/jeopardy`.
-5) Try this **ONLY IF YOU DARE**: Run `make intlock` to make a version of the program which cannot be stopped by `^C`, found in `build/jeopardy-intlock`.
+5) Try this **ONLY IF YOU DARE**: Append target `intlock` to make a version of the program which cannot be stopped by `^C`, and append target `vollock` to make a version of the program that keeps the volume of the main device to maximum, and keeps unmuting it.
 
 ## Install
 
