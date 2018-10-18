@@ -39,6 +39,6 @@ clean:
 	rm -f $(BUILD_DIR)/*.o
 	
 fclean: clean
-	rm -f $(OUTPUT) $(INTLOCK)
+	rm -f $(OUTPUT) $(OUTPUT_INT)
 	
 .PHONY: all re intlock clean fclean
