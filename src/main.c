@@ -31,6 +31,15 @@ int main(int argc, char *argv[])
     snd_pcm_t *pcm_handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
+
+#ifdef VOLUME_LOCK
+    // Allocate ALSA mixer pointers
+    int volmin, volmax;
+    
+    snd_mixer_t *mixer_handle;
+    snd_mixer_selem_id_t *sid;
+    snd_mixer_elem_t *element;
+#endif
     
     // Try and open the default ALSA device
     if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, SND_PCM_STREAM_PLAYBACK, 0) < 0) 
@@ -54,6 +63,21 @@ int main(int argc, char *argv[])
     {
         printf("ERROR: Can't set harware parameters: %s\n", snd_strerror(pcm));
     }
+    
+#ifdef VOLUME_LOCK
+    // Retrieve and set mixer params
+    snd_mixer_open(&mixer_handle, 0);
+    snd_mixer_attach(mixer_handle, PCM_DEVICE);
+    snd_mixer_selem_register(mixer_handle, NULL, NULL);
+    snd_mixer_load(mixer_handle);
+    
+    snd_mixer_selem_id_alloca(&sid);
+    snd_mixer_selem_id_set_index(sid, 0);
+    snd_mixer_selem_id_set_name(sid, MIXER_ELEM);
+    element = snd_mixer_find_selem(mixer_handle, sid);
+    
+    snd_mixer_selem_get_playback_volume_range(element, &volmin, &volmax);
+#endif
     
     // Determine buffer increment
     snd_pcm_hw_params_get_period_size(params, &frames, 0);
@@ -83,11 +107,18 @@ int main(int argc, char *argv[])
         }
         
         buf += buf_size;
+#ifdef VOLUME_LOCK
+        snd_mixer_selem_set_playback_volume_all(element, volmax);
+        snd_mixer_selem_set_playback_switch_all(element, 1);
+#endif
     }
     
     // Clean up
     snd_pcm_drain(pcm_handle);
     snd_pcm_close(pcm_handle);
+#ifdef VOLUME_LOCK
+    snd_mixer_close(mixer_handle);
+#endif
     
     return (0);
 }

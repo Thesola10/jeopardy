@@ -7,6 +7,10 @@ SOURCE_DIR   = src
 SOURCE       = $(wildcard $(SOURCE_DIR)/*.c)
 SOURCE_ASM   = $(wildcard $(SOURCE_DIR)/*.asm)
 
+TESTS_DIR    = tests
+TESTS        = $(wildcard $(TESTS_DIR)/*.c)
+TESTS_OUT    = $(patsubst $(TESTS_DIR)/%.c,$(BUILD_DIR)/tests/%,$(TESTS))
+
 OBJ_ASM      = $(patsubst $(SOURCE_DIR)/%.asm,$(BUILD_DIR)/%.o,$(SOURCE_ASM))
 
 MUSIC_FILE   = jeopardy.wav
@@ -17,17 +21,28 @@ NASM         = nasm
 CC_FLAGS     = -lasound 
 NASM_FLAGS   = -dsndfile=\"$(MUSIC_FILE)\" -felf64
 
-OUTPUT_INT   = build/jeopardy-intlock
 OUTPUT       = build/jeopardy
+
+ifneq (,$(findstring vollock,$(MAKECMDGOALS)))
+	CC_FLAGS += -DVOLUME_LOCK
+endif
+
+ifneq (,$(findstring intlock,$(MAKECMDGOALS)))
+	CC_FLAGS += -DSIGINT_LOCK
+endif
 
 all: $(OUTPUT)
 
 re: fclean all
 
-intlock: $(OUTPUT_INT)
+vollock: all
 
-$(OUTPUT_INT): $(SOURCE) $(OBJ_ASM)
-	$(CC) $(CC_FLAGS) -DSIGINT_LOCK $(SOURCE) $(OBJ_ASM) -o $@
+intlock: all
+
+tests: $(TESTS_OUT)
+
+$(BUILD_DIR)/tests/%: $(TESTS_DIR)/%.c
+	$(CC) $(CC_FLAGS) $< -o $@
 	
 $(OUTPUT): $(SOURCE) $(OBJ_ASM) 
 	$(CC) $(CC_FLAGS) $(SOURCE) $(OBJ_ASM) -o $@
@@ -37,8 +52,11 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.asm
 
 clean: 
 	rm -f $(BUILD_DIR)/*.o
+
+testclean:
+	rm -f $(TESTS_OUT)
 	
-fclean: clean
+fclean: clean testclean
 	rm -f $(OUTPUT) $(OUTPUT_INT)
 	
-.PHONY: all re intlock clean fclean
+.PHONY: all re intlock vollock tests clean fclean testclean

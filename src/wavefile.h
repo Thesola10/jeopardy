@@ -10,6 +10,7 @@
 #include <alsa/asoundlib.h>
 
 #define PCM_DEVICE "default"
+#define MIXER_ELEM "Master"
 
 typedef struct {
     // RIFF Header
