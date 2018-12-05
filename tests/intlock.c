@@ -1,7 +1,7 @@
 /**
  * Jeopardy Tests (C) Karim 'TheSola10' Vergnes <thesola10@bobile.fr>
  * License: GNU GPL 3.0
- * Program to test the code that sets the volume to maximum.
+ * Program to test the code that catches SIGINT.
  */
 
 #include <signal.h>
