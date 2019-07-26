@@ -25,22 +25,30 @@ How to install on your ~~victim's~~ computer:
 
 bash: Write the following in `~/.bashrc`
 
-        PROMPT_COMMAND="/path/to/jeopardy"
+```bash
+PROMPT_COMMAND="/path/to/jeopardy"
+```
 
 zsh: Write the following in `~/.zshrc`
 
-        function run_jeopardy() {
-            "/path/to/jeopardy"
-        }
-        precmd_functions+=(run_jeopardy)
-        
+```zsh
+function run_jeopardy() {
+    "/path/to/jeopardy"
+}
+precmd_functions+=(run_jeopardy)
+```
+
 fish: Write the following in `~/.config/fish/config.fish`
 
-        function fish_prompt
-            "/path/to/jeopardy"
-        end
+```fish
+function fish_prompt
+    "/path/to/jeopardy"
+end
+```
         
 tcsh: Write the following in `~/.tcshrc`
 
-        alias precmd "/path/to/jeopardy"
+```tcsh
+alias precmd "/path/to/jeopardy"
+```
 
